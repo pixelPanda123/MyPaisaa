@@ -1,0 +1,18 @@
+
+{
+    "id": 121212,
+    "customerId": "C21214124969",
+    "firstname": "M",                   // given by customer/admin at the time of onboarding
+    "lastname": "Sathish Kumar",        // given by customer/admin at the time of onboarding
+    "fathername": "M RAMANATHAN",       // captured from aadhaar OCR/API or customer/admin
+    "aadharno": "395724429814",         // given by customer
+    "pancardno": "BUXPS2681D",          // given by customer
+    "gender": "MALE",                   // captured from aadhaar OCR/API or admin
+    "currentaddress": "#223, N A THEVAR STREET, OLYMBUS, COIMBATORE, SOUTH DISTRICT - 641045",  // given by customer
+    "nameasperaadhar": "M Sathish Kumar",   // aadhaar name captured from aadhaar OCR/API
+    "fullname": "M SATHISH KUMAR",      // PAN Name captured from PAN API
+    "panvalidity": "VALID",             // PAN Name captured from PAN API
+    "dob": "03-06-1986",                // PAN Name captured from PAN API
+    "aadhaarAddress": "223, N A THEVAR STREET, OLYMBUS, COIMBATORE, SOUTH COIMBATORE, SOUTH DISTRICT - 641045", // captured from aadhaar OCR/API
+    "isAadharverified": "True"          // captured from aadhaar OCR/API
+}

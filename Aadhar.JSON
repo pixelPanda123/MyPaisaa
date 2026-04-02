@@ -1,0 +1,29 @@
+{
+    "_comment": "Assumed Aadhaar OTP/offline XML parsed response schema (UIDAI / DigiLocker / Karza style). Replace with actual provider schema.",
+    "request_id": "aadhaar-verify-xyz456",
+    "status": "success",
+    "aadhaar_number_last4": "9814",
+    "name": "M SATHISH KUMAR",
+    "date_of_birth": "1986-06-03",
+    "gender": "M",
+    "address": {
+      "house": "223",
+      "street": "N A THEVAR STREET",
+      "locality": "RAMANATHAPURAM",
+      "city": "COIMBATORE",
+      "district": "COIMBATORE",
+      "state": "Tamil Nadu",
+      "state_code": "TN",
+      "pin_code": "641045",
+      "country": "India",
+      "full_address": "223 N A THEVAR STREET RAMANATHAPURAM COIMBATORE COIMBATORE Tamil Nadu 641045"
+    },
+    "year_of_birth": "1986",
+    "share_code": null,
+    "verified_at": "2024-01-15T10:22:00Z",
+    "_notes": {
+      "aadhaar_number_last4": "Full Aadhaar not stored per UIDAI rules — only last 4 digits",
+      "address": "UIDAI address breakdown — structured vs credit report which is a raw string",
+      "year_of_birth": "Some older Aadhaar records only have year, not full DOB"
+    }
+  }

@@ -1,0 +1,18 @@
+{
+    "_comment": "Assumed PAN verification API response schema (Karza / Cashfree / Setu style). Replace with actual provider schema.",
+    "request_id": "pan-verify-abc123",
+    "status": "success",
+    "pan_number": "BUXPS2681D",
+    "name_on_pan": "M SATHISH KUMAR",
+    "date_of_birth": "1986-06-03",
+    "pan_status": "ACTIVE",
+    "pan_type": "Individual",
+    "aadhaar_linked": true,
+    "issued_date": null,
+    "_notes": {
+      "pan_status": "ACTIVE | INACTIVE | FAKE | SURRENDER",
+      "pan_type": "Individual | HUF | Company | Trust | etc.",
+      "name_on_pan": "Name as printed on PAN card — may differ from Aadhaar (initials, expansions)",
+      "aadhaar_linked": "Boolean — RBI mandates PAN-Aadhaar linking for KYC"
+    }
+  }
