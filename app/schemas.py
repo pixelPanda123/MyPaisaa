@@ -1,5 +1,20 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import Optional, List
+
+
+# -----------------------------
+# CREDIT REPORT SCHEMA
+# -----------------------------
+
+class CreditReport(BaseModel):
+    name: Optional[str]
+    dob: Optional[str]
+    pan: Optional[str]
+    address: Optional[str]
+
+    # optional extras (safe to ignore if not present)
+    phone: Optional[str]
+    email: Optional[str]
 
 
 # -----------------------------
@@ -22,7 +37,7 @@ class KYCRequest(BaseModel):
     fathername: Optional[str]
     gender: Optional[str]
     aadhar_dob: Optional[str]
-    isAadharverified: Optional[str]  # NOTE: string → will normalize later
+    isAadharverified: Optional[str]
 
     # PAN-related
     pancardno: Optional[str]
@@ -30,12 +45,11 @@ class KYCRequest(BaseModel):
     panvalidity: Optional[str]
     pan_dob: Optional[str]
 
-    #Other
-    dob: Optional[str]  
+    # fallback (legacy field)
+    dob: Optional[str]
 
-    # Future-proof (if added later)
-    # aadhaar_dob: Optional[str]
-    # credit_report: Optional[dict]
+    # ✅ NEW: Credit report
+    credit_report: Optional[CreditReport]
 
 
 # -----------------------------
@@ -59,7 +73,7 @@ class KYCAudit(BaseModel):
 
 
 class KYCResponse(BaseModel):
-    status: str  # approved / manual_review / rejected
+    status: str
     confidence_score: float
     issues: List[Issue]
     audit: KYCAudit
