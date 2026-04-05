@@ -3,18 +3,16 @@ from typing import Optional, List
 
 
 # -----------------------------
-# CREDIT REPORT SCHEMA
+# CREDIT REPORT
 # -----------------------------
 
 class CreditReport(BaseModel):
-    name: Optional[str]
-    dob: Optional[str]
-    pan: Optional[str]
-    address: Optional[str]
-
-    # optional extras (safe to ignore if not present)
-    phone: Optional[str]
-    email: Optional[str]
+    credit_name: Optional[str] = None
+    credit_dob: Optional[str] = None
+    credit_pan: Optional[str] = None
+    credit_address: Optional[str] = None
+    credit_phone: Optional[str] = None
+    credit_email: Optional[str] = None
 
 
 # -----------------------------
@@ -22,34 +20,37 @@ class CreditReport(BaseModel):
 # -----------------------------
 
 class KYCRequest(BaseModel):
-    id: Optional[int]
-    customerId: Optional[str]
+    id: Optional[int] = None
+    customer_id: Optional[str] = None 
 
-    # User-entered fields
-    firstname: Optional[str]
-    lastname: Optional[str]
-    currentaddress: Optional[str]
+    # USER INPUT
+    user_first_name: Optional[str] = None
+    user_last_name: Optional[str] = None
+    user_address: Optional[str] = None
 
-    # Aadhaar-related
-    aadharno: Optional[str]
-    nameasperaadhar: Optional[str]
-    aadhaarAddress: Optional[str]
-    fathername: Optional[str]
-    gender: Optional[str]
-    aadhar_dob: Optional[str]
-    isAadharverified: Optional[str]
+    # AADHAAR
+    aadhaar_number: Optional[str] = None
+    aadhaar_name: Optional[str] = None
+    aadhaar_address: Optional[str] = None
+    aadhaar_dob: Optional[str] = None
+    aadhaar_gender: Optional[str] = None
+    aadhaar_father_name: Optional[str] = None
+    aadhaar_verified: Optional[str] = None
 
-    # PAN-related
-    pancardno: Optional[str]
-    fullname: Optional[str]  # PAN name
-    panvalidity: Optional[str]
-    pan_dob: Optional[str]
+    # PAN
+    pan_number: Optional[str] = None
+    pan_name: Optional[str]  = None
+    pan_valid: Optional[str] = None
+    pan_dob: Optional[str] = None
 
-    # fallback (legacy field)
-    dob: Optional[str]
+    # FALLBACK (legacy)
+    dob: Optional[str] = None
 
-    # ✅ NEW: Credit report
-    credit_report: Optional[CreditReport]
+    # CREDIT REPORT
+    credit_report: Optional[CreditReport] = None
+
+    class Config:
+        extra = "allow"
 
 
 # -----------------------------
@@ -63,8 +64,8 @@ class Issue(BaseModel):
 
 class AuditCheck(BaseModel):
     name: str
-    result: Optional[str] = None
-    score: Optional[float] = None
+    result: Optional[str]
+    score: Optional[float]
 
 
 class KYCAudit(BaseModel):
@@ -77,3 +78,6 @@ class KYCResponse(BaseModel):
     confidence_score: float
     issues: List[Issue]
     audit: KYCAudit
+
+
+ 

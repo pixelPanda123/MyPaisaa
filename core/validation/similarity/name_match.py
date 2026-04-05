@@ -13,8 +13,7 @@ class NameMatch(BaseCheck):
         name1 = " ".join(tokens1)
         name2 = " ".join(tokens2)
 
-        score = fuzz.token_sort_ratio(name1, name2) / 100.0
-        return score
+        return fuzz.token_sort_ratio(name1, name2) / 100.0
 
     def compute(self, data):
         scores = []
@@ -23,6 +22,11 @@ class NameMatch(BaseCheck):
             (data["user_name"], data["aadhaar_name"]),
             (data["user_name"], data["pan_name"]),
             (data["pan_name"], data["aadhaar_name"]),
+
+            # NEW: credit comparisons
+            (data["user_name"], data["credit_name"]),
+            (data["pan_name"], data["credit_name"]),
+            (data["aadhaar_name"], data["credit_name"]),
         ]
 
         for t1, t2 in pairs:
