@@ -1,6 +1,6 @@
 # app/routes.py
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from app.schemas import KYCRequest, KYCResponse
 
 from core.normalization.normalizer import normalize_kyc_data
@@ -13,54 +13,41 @@ from core.decision.decision_engine import DecisionEngine
 router = APIRouter()
 
 
-@router.post("/kyc/verify")
-
-def verify_kyc(request: KYCRequest):
+@router.post("/kyc/verify", response_model=KYCResponse)
+async def verify_kyc(request: KYCRequest):
     print("HIT")
 
-    normalized = normalize_kyc_data(request)
-    print("NORMALIZED:", normalized)
-
-    checks = [NameMatch(), AddressMatch()]
-    scorer = Scorer(checks)
-
-    score_result = scorer.compute(normalized)
-    print("SCORE RESULT:", score_result)
-
-    decision_engine = DecisionEngine()
-    result = decision_engine.evaluate(normalized, score_result)
-
-    print("FINAL RESULT:", result)
-
-    return result
-# @router.post("/kyc/verify", response_model=KYCResponse)
-# def verify_kyc(request: KYCRequest):
-    
     # -----------------------
     # 1. Normalization
     # -----------------------
-    normalized_data = normalize_kyc_data(request)
+    try:
+        normalized = normalize_kyc_data(request)
+        print("NORMALIZED:", normalized)
+    except Exception as e:
+        print("NORMALIZATION ERROR:", e)
+        raise HTTPException(status_code=422, detail=f"Normalization failed: {str(e)}")
 
     # -----------------------
-    # 2. Similarity Checks
+    # 2. Checks + Scoring
     # -----------------------
-    checks = [
-        NameMatch(),
-        AddressMatch()
-    ]
+    try:
+        checks = [NameMatch(), AddressMatch()]
+        scorer = Scorer(checks)
+        score_result = scorer.compute(normalized)
+        print("SCORE RESULT:", score_result)
+    except Exception as e:
+        print("SCORING ERROR:", e)
+        raise HTTPException(status_code=500, detail=f"Scoring failed: {str(e)}")
 
     # -----------------------
-    # 3. Scoring
+    # 3. Decision
     # -----------------------
-    scorer = Scorer(checks)
-    score_result = scorer.compute(normalized_data)
-
-    # -----------------------
-    # 4. Decision
-    # -----------------------
-    decision_engine = DecisionEngine()
-    result = decision_engine.evaluate(normalized_data, score_result)
-
-    print("FINAL RESULT:", result)
+    try:
+        decision_engine = DecisionEngine()
+        result = decision_engine.evaluate(normalized, score_result)
+        print("FINAL RESULT:", result)
+    except Exception as e:
+        print("DECISION ERROR:", e)
+        raise HTTPException(status_code=500, detail=f"Decision engine failed: {str(e)}")
 
     return result

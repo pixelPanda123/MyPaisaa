@@ -15,9 +15,9 @@ def normalize_kyc_data(data):
         data.user_last_name
     )
 
-    normalized["user_name"] = normalize_name(user_full_name)
+    normalized["user_name"]    = normalize_name(user_full_name)
     normalized["aadhaar_name"] = normalize_name(data.aadhaar_name)
-    normalized["pan_name"] = normalize_name(data.pan_name)
+    normalized["pan_name"]     = normalize_name(data.pan_name)
 
     credit_name = data.credit_report.credit_name if data.credit_report else None
     normalized["credit_name"] = normalize_name(credit_name)
@@ -26,9 +26,19 @@ def normalize_kyc_data(data):
     # DOB
     # -----------------------
 
-    pan_dob = data.pan_dob or data.dob
+    # pan_dob is preferred. dob is a legacy fallback — flagged so downstream
+    # consumers know the source and can weight it accordingly.
+    if data.pan_dob:
+        pan_dob = data.pan_dob
+        normalized["pan_dob_source"] = "pan"
+    elif data.dob:
+        pan_dob = data.dob
+        normalized["pan_dob_source"] = "legacy_fallback"
+    else:
+        pan_dob = None
+        normalized["pan_dob_source"] = None
 
-    normalized["pan_dob"] = normalize_dob(pan_dob)
+    normalized["pan_dob"]     = normalize_dob(pan_dob)
     normalized["aadhaar_dob"] = normalize_dob(data.aadhaar_dob)
 
     credit_dob = data.credit_report.credit_dob if data.credit_report else None
@@ -38,7 +48,7 @@ def normalize_kyc_data(data):
     # ADDRESS
     # -----------------------
 
-    normalized["user_address"] = normalize_address(data.user_address)
+    normalized["user_address"]    = normalize_address(data.user_address)
     normalized["aadhaar_address"] = normalize_address(data.aadhaar_address)
 
     credit_address = data.credit_report.credit_address if data.credit_report else None
@@ -48,16 +58,26 @@ def normalize_kyc_data(data):
     # PAN
     # -----------------------
 
-    normalized["pan"] = data.pan_number.upper() if data.pan_number else None
-    normalized["pan_valid"] = (data.pan_valid or "").upper() == "VALID"
+    # Strip whitespace before uppercasing to handle credit bureau formatting like "ABCDE 1234F"
+    normalized["pan"] = data.pan_number.replace(" ", "").upper() if data.pan_number else None
+
+    # Tri-state: True = valid, False = explicitly invalid, None = unknown
+    if data.pan_valid is None:
+        normalized["pan_valid"] = None
+    else:
+        normalized["pan_valid"] = data.pan_valid.strip().upper() == "VALID"
 
     credit_pan = data.credit_report.credit_pan if data.credit_report else None
-    normalized["credit_pan"] = credit_pan.upper() if credit_pan else None
+    normalized["credit_pan"] = credit_pan.replace(" ", "").upper() if credit_pan else None
 
     # -----------------------
     # AADHAAR VERIFIED
     # -----------------------
 
-    normalized["aadhaar_verified"] = str(data.aadhaar_verified).lower() == "true"
+    # Tri-state: True = verified, False = explicitly not verified, None = unknown
+    if data.aadhaar_verified is None:
+        normalized["aadhaar_verified"] = None
+    else:
+        normalized["aadhaar_verified"] = str(data.aadhaar_verified).strip().lower() == "true"
 
     return normalized

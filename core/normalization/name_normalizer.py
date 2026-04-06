@@ -11,14 +11,11 @@ def normalize_name(name: str):
     # Remove punctuation
     name = re.sub(r"[^\w\s]", "", name)
 
-    # Split into tokens
-    tokens = name.split()
+    # Split into tokens, remove empty
+    tokens = [t for t in name.split() if t]
 
-    # Remove empty tokens
-    tokens = [t for t in tokens if t]
-
-    # Sort tokens (handles order differences)
-    tokens.sort()
+    # NOTE: Sorting intentionally removed — order is preserved here.
+    # Order-insensitive comparison is handled by token_sort_ratio in the matcher.
 
     return tokens
 
