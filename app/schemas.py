@@ -52,8 +52,8 @@ class KYCRequest(BaseModel):
     @model_validator(mode="after")
     def check_at_least_one_source(self) -> "KYCRequest":
         has_aadhaar = bool(self.aadhaar_number or self.aadhaar_name)
-        has_pan = bool(self.pan_number or self.pan_name)
-        has_credit = self.credit_report is not None
+        has_pan     = bool(self.pan_number or self.pan_name)
+        has_credit  = self.credit_report is not None
 
         if not any([has_aadhaar, has_pan, has_credit]):
             raise ValueError(
@@ -70,23 +70,56 @@ class KYCRequest(BaseModel):
 # -----------------------------
 
 class Issue(BaseModel):
-    field: str
-    message: str
+    field:    str
+    message:  str
+    severity: Literal["hard", "soft"]   # hard = caused reject/review, soft = informational
 
 
-class AuditCheck(BaseModel):
-    name: str
-    result: Optional[str] = None
-    score: Optional[float] = None
+# --- Similarity check audit (NameMatch, AddressMatch) ---
+class SimilarityCheckAudit(BaseModel):
+    name:            str
+    available:       bool
+    score:           Optional[float] = Field(default=None, ge=0.0, le=1.0)
+    pairs_evaluated: int             = 0
+    weight:          float
 
 
+# --- DOB hard check audit ---
+class DOBAudit(BaseModel):
+    available:        bool
+    passed:           Optional[bool]  = None   # None = no DOB data to evaluate
+    pairs_evaluated:  int             = 0
+    mismatched_pairs: List[str]       = []
+
+
+# --- Individual credit consistency sub-check ---
+class CreditConsistencyCheck(BaseModel):
+    check:   str
+    passed:  bool
+    detail:  Optional[str] = None   # present on both pass and fail for numeric checks
+
+
+# --- Credit analyzer audit ---
+class CreditAudit(BaseModel):
+    available:          bool
+    score:              Optional[float] = Field(default=None, ge=0.0, le=1.0)
+    completeness_score: Optional[float] = Field(default=None, ge=0.0, le=1.0)
+    consistency_score:  Optional[float] = Field(default=None, ge=0.0, le=1.0)
+    consistency_checks: List[CreditConsistencyCheck] = []
+
+
+# --- Top-level grouped audit ---
 class KYCAudit(BaseModel):
-    checks: List[AuditCheck]
-    final_score: float = Field(ge=0.0, le=1.0)
+    identity_checks: List[SimilarityCheckAudit]
+    dob:             Optional[DOBAudit]  = None
+    credit:          Optional[CreditAudit] = None
+    final_score:     float               = Field(ge=0.0, le=1.0)
+    identity_score:  Optional[float]     = Field(default=None, ge=0.0, le=1.0)
+    credit_score:    Optional[float]     = Field(default=None, ge=0.0, le=1.0)
 
 
 class KYCResponse(BaseModel):
-    status: Literal["approved", "manual_review", "rejected"]
+    status:           Literal["approved", "manual_review", "rejected"]
     confidence_score: float = Field(ge=0.0, le=1.0)
-    issues: List[Issue]
-    audit: KYCAudit
+    issues:           List[Issue]
+    audit:            KYCAudit

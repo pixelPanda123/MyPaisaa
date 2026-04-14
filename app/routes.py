@@ -8,7 +8,8 @@ from core.validation.similarity.name_match import NameMatch
 from core.validation.similarity.address_match import AddressMatch
 from core.scoring.scorer import Scorer
 from core.decision.decision_engine import DecisionEngine
-
+from core.scoring.credit_analyzer import CreditAnalyzer
+from core.validation.similarity.dob_match import DOBMatch
 
 router = APIRouter()
 
@@ -31,8 +32,11 @@ async def verify_kyc(request: KYCRequest):
     # 2. Checks + Scoring
     # -----------------------
     try:
-        checks = [NameMatch(), AddressMatch()]
-        scorer = Scorer(checks)
+        scorer = Scorer(
+            checks=[NameMatch(), AddressMatch()],
+            dob_check=DOBMatch(),
+            credit_analyzer=CreditAnalyzer()
+        )
         score_result = scorer.compute(normalized)
         print("SCORE RESULT:", score_result)
     except Exception as e:
